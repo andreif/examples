@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 class WeatherController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate {
     var backgroundImageView: UIImageView?
-    var blurredImageView: UIImageView?
+    var blurView: UIVisualEffectView?
     var tableView: UITableView?
     var screenHeight: CGFloat = 0
     
@@ -32,12 +32,13 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
         self.backgroundImageView!.contentMode = UIViewContentMode.ScaleAspectFill
         self.view.addSubview(self.backgroundImageView!)
         
-        self.blurredImageView = BlurImageView(frame: self.view.frame)
-        self.blurredImageView!.image = background
-        self.blurredImageView!.contentMode = UIViewContentMode.ScaleAspectFill
-        self.blurredImageView!.alpha = 0
-        self.view.addSubview(self.blurredImageView!)
-        
+        let blur = UIBlurEffect(style: UIBlurEffectStyle.Light)
+        self.blurView = UIVisualEffectView(effect: blur)
+        self.blurView!.contentMode = UIViewContentMode.ScaleAspectFill
+        self.blurView!.alpha = 0
+        self.blurView!.frame = self.view.frame
+        self.view.addSubview(self.blurView!)
+
         self.tableView = UITableView()
         self.tableView!.backgroundColor = UIColor.clearColor()
         self.tableView!.delegate = self
@@ -127,14 +128,13 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // TODO: Return count of forecast
-        return 10
+        return 7
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCellWithIdentifier("CELL", forIndexPath:indexPath) as? UITableViewCell
         if cell == nil { cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "CELL") }
         
-        // 3
         cell!.selectionStyle = UITableViewCellSelectionStyle.None;
         cell!.backgroundColor = UIColor(white:0, alpha:0.2)
         cell!.textLabel!.textColor = UIColor.whiteColor()
@@ -155,7 +155,7 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
 
         let bounds = self.view.bounds
         self.backgroundImageView!.frame = bounds
-        self.blurredImageView!.frame = bounds
+        self.blurView!.frame = bounds
         self.tableView!.frame = bounds
     }
     
@@ -163,21 +163,6 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
         let height: CGFloat = scrollView.bounds.size.height
         let position: CGFloat = max(scrollView.contentOffset.y, 0.0)
         let percent: CGFloat = pow(min(position / height, 1.0), 3)
-        self.blurredImageView!.alpha = percent
-    }
-}
-
-class BlurImageView: UIImageView {
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        var blur: UIBlurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
-        var effectView: UIVisualEffectView = UIVisualEffectView(effect: blur)
-        effectView.frame = frame
-        addSubview(effectView)
-    }
-    
-    required init(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        self.blurView!.alpha = percent
     }
 }
