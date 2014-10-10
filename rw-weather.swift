@@ -44,6 +44,8 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
         self.tableView!.dataSource = self
         self.tableView!.separatorColor = UIColor(white:1, alpha:0.2)
         self.tableView!.pagingEnabled = true
+        self.tableView!.showsVerticalScrollIndicator = false
+        //self.tableView!.bounces = false
         self.view.addSubview(self.tableView!)
         
         self.tableView!.registerClass(UITableViewCell.self, forCellReuseIdentifier: "CELL")
@@ -155,6 +157,13 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
         self.backgroundImageView!.frame = bounds
         self.blurredImageView!.frame = bounds
         self.tableView!.frame = bounds
+    }
+    
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        let height: CGFloat = scrollView.bounds.size.height
+        let position: CGFloat = max(scrollView.contentOffset.y, 0.0)
+        let percent: CGFloat = pow(min(position / height, 1.0), 3)
+        self.blurredImageView!.alpha = percent
     }
 }
 
