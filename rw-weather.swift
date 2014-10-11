@@ -22,6 +22,13 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
     var blurView: UIVisualEffectView?
     var tableView: UITableView?
     var screenHeight: CGFloat = 0
+    var parallax: CGFloat = 20
+    
+    func parallax_frame(frame: CGRect) -> CGRect {
+        return CGRectMake(parallax * -1, parallax * -1,
+            frame.size.width + 2 * parallax,
+            frame.size.height + 2 * parallax)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,18 +36,12 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
         
         let background = UIImage(named: "bg")
         self.backgroundImageView = UIImageView(image: background)
-        self.backgroundImageView!.backgroundColor = UIColor.blackColor()
-        //self.backgroundImageView!.contentMode = UIViewContentMode.ScaleAspectFill
+        self.backgroundImageView!.contentMode = UIViewContentMode.ScaleAspectFill
         self.view.addSubview(self.backgroundImageView!)
 
         // Parallax
         let headerFrame: CGRect = UIScreen.mainScreen().bounds
-        let parallax: CGFloat = 20
-        let parallaxFrame = CGRectMake(parallax * -1, parallax * -1,
-            headerFrame.size.width + 2 * parallax,
-            headerFrame.size.height + 2 * parallax)
-        
-        self.backgroundImageView!.frame = parallaxFrame
+        self.backgroundImageView!.frame = parallax_frame(headerFrame)
         
         let verticalMotionEffect = UIInterpolatingMotionEffect(keyPath:"center.y", type:UIInterpolatingMotionEffectType.TiltAlongVerticalAxis)
         verticalMotionEffect.minimumRelativeValue = parallax
@@ -182,7 +183,7 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
         super.viewWillLayoutSubviews()
 
         let bounds = self.view.bounds
-        //self.backgroundImageView!.frame = bounds
+        self.backgroundImageView!.frame = parallax_frame(bounds)
         self.blurView!.frame = bounds
         self.tableView!.frame = bounds
     }
