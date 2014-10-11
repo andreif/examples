@@ -29,9 +29,31 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
         
         let background = UIImage(named: "bg")
         self.backgroundImageView = UIImageView(image: background)
-        self.backgroundImageView!.contentMode = UIViewContentMode.ScaleAspectFill
+        self.backgroundImageView!.backgroundColor = UIColor.blackColor()
+        //self.backgroundImageView!.contentMode = UIViewContentMode.ScaleAspectFill
         self.view.addSubview(self.backgroundImageView!)
+
+        // Parallax
+        let headerFrame: CGRect = UIScreen.mainScreen().bounds
+        let parallax: CGFloat = 20
+        let parallaxFrame = CGRectMake(parallax * -1, parallax * -1,
+            headerFrame.size.width + 2 * parallax,
+            headerFrame.size.height + 2 * parallax)
         
+        self.backgroundImageView!.frame = parallaxFrame
+        
+        let verticalMotionEffect = UIInterpolatingMotionEffect(keyPath:"center.y", type:UIInterpolatingMotionEffectType.TiltAlongVerticalAxis)
+        verticalMotionEffect.minimumRelativeValue = parallax
+        verticalMotionEffect.maximumRelativeValue = parallax * -1
+        
+        let horizontalMotionEffect = UIInterpolatingMotionEffect(keyPath:"center.x", type:UIInterpolatingMotionEffectType.TiltAlongHorizontalAxis)
+        horizontalMotionEffect.minimumRelativeValue = parallax
+        horizontalMotionEffect.maximumRelativeValue = parallax * -1
+        let group = UIMotionEffectGroup()
+        group.motionEffects = [horizontalMotionEffect, verticalMotionEffect]
+        self.backgroundImageView!.addMotionEffect(group)
+        
+        // Blur
         let blur = UIBlurEffect(style: UIBlurEffectStyle.Light)
         self.blurView = UIVisualEffectView(effect: blur)
         self.blurView!.contentMode = UIViewContentMode.ScaleAspectFill
@@ -51,11 +73,11 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
         
         self.tableView!.registerClass(UITableViewCell.self, forCellReuseIdentifier: "CELL")
         
-        let headerFrame: CGRect = UIScreen.mainScreen().bounds
         let inset: CGFloat = 20
         let temperatureHeight: CGFloat = 110
         let hiloHeight: CGFloat = 40
         let iconHeight: CGFloat = 30
+
         let hiloFrame: CGRect = CGRectMake(inset,
             headerFrame.size.height - hiloHeight,
             headerFrame.size.width - (2 * inset),
@@ -71,6 +93,7 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
             temperatureFrame.origin.y - iconHeight,
             iconHeight * 1.0,
             iconHeight * 1.0)
+
         let conditionsFrame: CGRect = CGRectMake(
             iconFrame.origin.x + (iconHeight + 10),
             temperatureFrame.origin.y - iconHeight,
@@ -123,12 +146,12 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 2
+        return 1
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // TODO: Return count of forecast
-        return 7
+        return 8
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -147,14 +170,19 @@ class WeatherController: UIViewController, UITableViewDataSource, UITableViewDel
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         // TODO: Determine cell height based on screen
-        return 44
+        // indexPath.section
+        if (indexPath.row == 0) {
+            return 264
+        } else {
+            return 44
+        }
     }
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
         let bounds = self.view.bounds
-        self.backgroundImageView!.frame = bounds
+        //self.backgroundImageView!.frame = bounds
         self.blurView!.frame = bounds
         self.tableView!.frame = bounds
     }
